@@ -4,10 +4,12 @@ const ejs = require('ejs')
 const bcrypt = require('bcrypt')
 const cors = require('cors')
 const bodyparser = require('body-parser')
+const jwt = require('jsonwebtoken')
 const PORT = 3000 || process.env
 const employee = require('./models/employee')
 const app = express()
 
+const JWT_SECRET = '2ayisadzsldszaladlweoewqorwqoqwlaaxlweqzcvnmfda@#$%@lldladsdalwoerutqql/a/s.ccmcvncvldsaw'
 app.use(cors())
 app.use(express.static('public'))
 
@@ -87,6 +89,31 @@ app.post('/signup', async (req, res) => {
     console.log('Successfully Created employer')
 
     return res.json({ status: "ok" })
+})
+
+app.get('/login', (req, res) => {
+    res.render('login.ejs')
+})
+
+app.post('/login', async (req, res) => {
+    console.log(req.body)
+    const password = req.body.password, useremail = req.body.useremail
+    const findUser = await employee.findOne({ email: useremail })
+    if (!findUser) {
+        return res.json({ status: 'error', error: 'Invalid email or password database' })
+    }
+    if (await bcrypt.compare(password, findUser.password)) {
+        const token = jwt.sign(
+            {
+                id: findUser._id,
+                useremail: findUser.useremail
+            },
+            JWT_SECRET
+        )
+        return res.json({ status: 'ok', data: token })
+    }
+    res.json({ status: 'error', error: 'Invalid email or password' })
+
 })
 
 
