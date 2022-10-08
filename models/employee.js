@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const employeeSchema = new Schema({
     name: {
-        type: String, required: true, unique: true
+        type: String, required: true
     },
 
     email: {
@@ -15,22 +15,21 @@ const employeeSchema = new Schema({
     Department: {
         type: String, required: true
     },
-    joiningDate: {
+    DateOfJoin: {
         type: Date, required: true
     },
     isAdmin: {
         type: Boolean, default: false
     }
     ,
-    employerId: {
-        type: String, required: true
-    },
+    // employerId: {
+    //     type: String
+    // },
 
     password: {
         type: String, required: true
     }
 }, { timestamps: true })
 
-
-const user = mongoose.model('users', userSchema)
-module.exports = user
+const employee = mongoose.model('employees', employeeSchema)
+module.exports = employee

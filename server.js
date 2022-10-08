@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const cors = require('cors')
 const bodyparser = require('body-parser')
 const PORT = 3000 || process.env
-const User = require('./models/user')
+const employee = require('./models/employee')
 const app = express()
 
 app.use(cors())
@@ -35,9 +35,11 @@ app.post('/signup', async (req, res) => {
     if (!req.body) {
         return res.json({ status: 'error' })
     }
-    const username = req.body.username, password = req.body.password, useremail = req.body.useremail
+    const username = req.body.username, password = req.body.password, useremail = req.body.useremail, phoneNumber = req.body.phoneNumber
+    const department = req.body.department, doj = req.body.doj
+
     if (!username || typeof username !== 'string') {
-        return res.json({ status: 'error', error: 'invalid username or email ' })
+        return res.json({ status: 'error', error: 'invalid username' })
     }
     if (!password || typeof password !== 'string') {
         return res.json({ status: 'error', error: 'invalid password' })
@@ -46,22 +48,35 @@ app.post('/signup', async (req, res) => {
     if (password.length < 6) {
         return res.json({ status: 'error', error: 'Password is too small, should be atleast 6 Characters' })
     }
+    if (!phoneNumber || typeof phoneNumber !== 'string') {
+        return res.json({ status: 'error', error: 'invalid phoneNumber' })
+    }
+    if (!department || typeof department !== 'string') {
+        return res.json({ status: 'error', error: 'invalid department' })
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10)
     console.log('hashed Password ', hashedPassword)
 
     try {
-        const userCreated = await User.create({
-            username: username,
+        const employeeCreated = await employee.create({
+            name: username,
             email: useremail,
+            contact: phoneNumber,
+            Department: department,
+            DateOfJoin: doj,
+            isAdmin: true,
             password: hashedPassword
+
+
         })
-        console.log(userCreated)
+        console.log(employeeCreated)
 
     }
     catch (error) {
         console.log(error)
         if (error.code == 11000) {
-            return res.json({ status: "error", error: "duplicate username or useremail" })
+            return res.json({ status: "error", error: "duplicate employeename or employeeemail" })
 
         }
         else {
@@ -69,7 +84,7 @@ app.post('/signup', async (req, res) => {
         }
 
     }
-    console.log('Successfully Created User')
+    console.log('Successfully Created employer')
 
     return res.json({ status: "ok" })
 })
