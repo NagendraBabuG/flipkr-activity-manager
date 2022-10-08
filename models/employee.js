@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
+var objectId = Schema.objectId
 const employeeSchema = new Schema({
     name: {
         type: String, required: true
@@ -22,6 +23,9 @@ const employeeSchema = new Schema({
         type: Boolean, default: false
     }
     ,
+    adminId: {
+        type: mongoose.Schema.Types.ObjectId, default: null
+    },
     // employerId: {
     //     type: String
     // },
