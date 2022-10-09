@@ -221,7 +221,21 @@ app.post('/login', async (req, res) => {
 
 })
 
+app.post('/addEmployee', auth, (req, res) => {
+    const name = req.body.name, password = req.body.password, contact = req.body.contact, doj = req.body.doj
+    const Deparment = req.body.Department, email = req.body.email
+    const adminId = req.body.id
+    console.log(req.body)
+    console.log(name, password, contact, doj, Deparment, email, adminId)
+    try {
 
+    }
+    catch (error) {
+
+    }
+    res.redirect('/dashboardA')
+
+})
 
 
 app.get('*', (req, res) => {
