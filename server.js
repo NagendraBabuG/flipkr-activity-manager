@@ -8,33 +8,57 @@ const jwt = require('jsonwebtoken')
 const PORT = 3000 || process.env
 const employee = require('./models/employee')
 const admin = require('./models/admin')
-var multer = require('multer');
+//var multer = require('multer')
+const cookieParser = require('cookie-parser')
 const user = require('./models/user')
-const { boolean } = require('mathjs')
+
+
 const app = express()
-var upload = multer();
+//var upload = multer()
 
-
+app.use(cookieParser())
 const JWT_SECRET = '2ayisadzsldszaladlweoewqorwqoqwlaaxlweqzcvnmfda@#$%@lldladsdalwoerutqql/a/s.ccmcvncvldsaw'
+const auth = async (req, res, next) => {
+    try {
+        console.log('verify User')
+        const token = req.cookies.jwt;
+        console.log(token)
+        const verifyUser = jwt.verify(token, JWT_SECRET)
+        console.log(verifyUser)
+        const employer = await admin.findOne({ email: verifyUser.useremail })
+        console.log(employer)
+        //   req.body.id = employer._id;
+        req.body.id = employer._id
+        next()
+
+    }
+    catch (error) {
+        res.status(401).send(error)
+        // res.redirect('/login')
+    }
+
+}
+
 //app.use(cors())
 app.use(express.static('public'))
-app.use(upload.array());
+//app.use(upload.array());
 //app.use(express.bodyParser());
 //app.use(bodyparser.json({ limit: "30mb", extended: true }))
-app.use(bodyparser.json());
+//app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }))
-//app.use(express.json())
+app.use(express.json())
 
 app.set('view engine', ejs)
 
 
 app.get('/', (req, res) => {
-    res.send('welcome');
+    //res.send('welcome');
+    res.render('home.ejs')
 })
 
-
-
 const CONNECTION_URL = 'mongodb+srv://apn:Gnb0009@cluster0.a7xl6ew.mongodb.net/?retryWrites=true&w=majority'
+
+
 app.get('/signup', async (req, res) => {
     res.render('signupAdmin.ejs')
 })
@@ -96,7 +120,27 @@ app.post('/signup', async (req, res) => {
 
     return res.json({ status: "ok" })
 })
-app.get('/dashboardA', (req, res) => {
+app.get('/dashboardA', auth, async (req, res) => {
+    //auth()
+    if (res.statusCode == 401) res.redirect('/login')
+    console.log(req.body)
+    let employees = [];
+    const adminId = req.body.id
+    console.log('admin Id ')
+    console.log(adminId)
+    const users = await employee.find({ adminId: adminId })
+    console.log(users)
+    users.forEach((user) => {
+        let emp = {};
+        emp._id = user._id;
+        emp.Department = user.Department
+        emp.phoneNumber = user.contact
+        emp.name = user.name
+        emp.email = user.email
+        employees.push(emp)
+    })
+    console.log(employees)
+
     res.render('dashboardAdmin.ejs')
 
 })
@@ -111,6 +155,7 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
+
     console.log(req.body)
     //console.log(req)
 
@@ -125,6 +170,12 @@ app.post('/login', async (req, res) => {
                     useremail: findAdmin.email
                 },
                     JWT_SECRET)
+
+                res.cookie("jwt", token, {
+                    expires: new Date(Date.now() + 6000000),
+                    httpOnly: true
+                })
+                console.log(token)
                 console.log('successfully signed in')
                 res.redirect('/dashboardA')
                 return;
@@ -146,9 +197,14 @@ app.post('/login', async (req, res) => {
                 },
                 JWT_SECRET
             )
+            res.cookie("jwt", token, {
+                expires: new Date(Date.now() + 6000000),
+                httpOnly: true
+            })
             //const isAdmin = findUser.isAdmin;
             // if (isAdmin) res.redirect('/dashboardA')
             // else res.redirect('/dashboardE')
+            console.log(token)
             console.log('successfully signed in')
             res.redirect('/dashboardE')
             return;
