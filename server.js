@@ -8,17 +8,21 @@ const jwt = require('jsonwebtoken')
 const PORT = 3000 || process.env
 const employee = require('./models/employee')
 const admin = require('./models/admin')
+var multer = require('multer');
 const user = require('./models/user')
 const { boolean } = require('mathjs')
 const app = express()
+var upload = multer();
+
 
 const JWT_SECRET = '2ayisadzsldszaladlweoewqorwqoqwlaaxlweqzcvnmfda@#$%@lldladsdalwoerutqql/a/s.ccmcvncvldsaw'
-app.use(cors())
+//app.use(cors())
 app.use(express.static('public'))
-
-app.use(bodyparser.json({ limit: "30mb", extended: true }))
-
-app.use(bodyparser.urlencoded({ limit: "30mb", extended: true }))
+app.use(upload.array());
+//app.use(express.bodyParser());
+//app.use(bodyparser.json({ limit: "30mb", extended: true }))
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }))
 //app.use(express.json())
 
 app.set('view engine', ejs)
@@ -92,6 +96,15 @@ app.post('/signup', async (req, res) => {
 
     return res.json({ status: "ok" })
 })
+app.get('/dashboardA', (req, res) => {
+    res.render('dashboardAdmin.ejs')
+
+})
+
+
+app.get('/dashboardE', (req, res) => {
+    res.render('dashboardEmployee.ejs')
+})
 
 app.get('/login', (req, res) => {
     res.render('login.ejs')
@@ -99,6 +112,8 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     console.log(req.body)
+    //console.log(req)
+
     const password = req.body.password, useremail = req.body.useremail
     const findUser = await employee.findOne({ email: useremail })
     if (!findUser) {
@@ -111,11 +126,14 @@ app.post('/login', async (req, res) => {
                 },
                     JWT_SECRET)
                 console.log('successfully signed in')
-                return res.json({ status: 'ok', data: token })
+                res.redirect('/dashboardA')
+
+                //res.json({ status: 'ok', data: token })
             }
-            return res.json({ status: 'error', error: "invalid email or Password" })
+            // return res.json({ status: 'error', error: "invalid email or Password" })
 
         }
+        res.redirect('/login')
     }
     else {
         if (await bcrypt.compare(password, findUser.password)) {
@@ -130,28 +148,21 @@ app.post('/login', async (req, res) => {
             // if (isAdmin) res.redirect('/dashboardA')
             // else res.redirect('/dashboardE')
             console.log('successfully signed in')
-            return res.json({ status: 'ok', data: token })
+            res.redirect('/dashboardE')
+            //return;
 
         }
-        return res.json({ status: 'error', error: 'Invalid email or password' })
+        // return res.json({ status: 'error', error: 'Invalid email or password' })
+        res.redirect('/login')
 
     }
 
-    return res.json({ status: 'error' })
+    //return res.json({ status: 'error' })
 
 
 })
 
 
-app.get('/dashboardA', (req, res) => {
-    res.render('/dashboardAmdin.ejs')
-
-})
-
-
-app.get('/dashboardE', (req, res) => {
-    res.render('/dashboardE.js')
-})
 
 
 app.get('*', (req, res) => {

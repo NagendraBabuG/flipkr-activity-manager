@@ -10,7 +10,7 @@
 
 <body>
     <h1>Login</h1>
-    <form id="log-form">
+    <form action='/login' method="POST">
         <label for="useremail">Email: </label>
         <input type="email" autocomplete="off" id="useremail" placeholder="Useremail">
         <br>
@@ -23,37 +23,49 @@
     </form>
 
     <script>
-        const form = document.getElementById('log-form')
-        if (form != null) form.addEventListener('submit', loginUser)
+        // const form = document.getElementById('log-form')
+        // if (form != null) form.addEventListener('submit', loginUser)
 
-        async function loginUser(event) {
-            event.preventDefault()
+        // async function loginUser(event) {
+        //     event.preventDefault()
 
-            const password = document.getElementById('password').value
-            const useremail = document.getElementById('useremail').value
-
-
-
-            const result = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    useremail,
-                    password
-
-                })
-            }).then((res) => res.json())
-            if (result.error) console.log(result.error)
-            console.log(result.status)
-
-            if (result.status == 'ok') {
-                console.log(result.data)
-            }
+        //     const password = document.getElementById('password').value
+        //     const useremail = document.getElementById('useremail').value
 
 
-        }
+        //     const result = fetch('https://login', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({
+        //             useremail,
+        //             password
+
+        //         })
+        //     }).then((res) => res.json())
+
+
+            // const result = await fetch('https://login', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         useremail,
+            //         password
+
+            //     })
+            // }).then((res) => res.json())
+            // if (result.error) console.log(result.error)
+            // console.log(result.status)
+
+            // if (result.status == 'ok') {
+            //     console.log(result.data)
+            // }
+
+
+        //}
     </script>
 
 
