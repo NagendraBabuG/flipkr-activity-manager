@@ -67,7 +67,26 @@
         <!-- <button class="btn ">Contact Now</button> -->
     </div>
 
+    <div>
+        <h1> Employees Details : </h1>
+        <% for(var i=0; i<employees.length; i++){ %>
+            <p>
+            <h3>
+                <%= employees[i].name%>
+            </h3>
+            <h3>
+                <%= employees[i].email %>
+            </h3>
+            <h3>
+                <%= employees[i].PhoneNumber %>
+            </h3>
+            <h3>
+                <%= employees[i].Department%>
+            </h3>
+            </p>
+            <% } %>
 
+    </div>
 
 
 

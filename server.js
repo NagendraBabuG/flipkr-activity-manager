@@ -131,8 +131,8 @@ app.get('/dashboardA', auth, async (req, res) => {
     const users = await employee.find({ adminId: adminId })
     console.log(users)
     users.forEach((user) => {
-        let emp = {};
-        emp._id = user._id;
+        let emp = {}
+        emp._id = user._id
         emp.Department = user.Department
         emp.phoneNumber = user.contact
         emp.name = user.name
@@ -141,7 +141,7 @@ app.get('/dashboardA', auth, async (req, res) => {
     })
     console.log(employees)
 
-    res.render('dashboardAdmin.ejs')
+    res.render('dashboardAdmin.ejs', { employees: employees })
 
 })
 
