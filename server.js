@@ -127,6 +127,7 @@ app.post('/login', async (req, res) => {
                     JWT_SECRET)
                 console.log('successfully signed in')
                 res.redirect('/dashboardA')
+                return;
 
                 //res.json({ status: 'ok', data: token })
             }
@@ -134,6 +135,7 @@ app.post('/login', async (req, res) => {
 
         }
         res.redirect('/login')
+        return;
     }
     else {
         if (await bcrypt.compare(password, findUser.password)) {
@@ -149,6 +151,7 @@ app.post('/login', async (req, res) => {
             // else res.redirect('/dashboardE')
             console.log('successfully signed in')
             res.redirect('/dashboardE')
+            return;
             //return;
 
         }
