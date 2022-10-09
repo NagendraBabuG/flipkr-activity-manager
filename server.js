@@ -7,6 +7,9 @@ const bodyparser = require('body-parser')
 const jwt = require('jsonwebtoken')
 const PORT = 3000 || process.env
 const employee = require('./models/employee')
+const admin = require('./models/admin')
+const user = require('./models/user')
+const { boolean } = require('mathjs')
 const app = express()
 
 const JWT_SECRET = '2ayisadzsldszaladlweoewqorwqoqwlaaxlweqzcvnmfda@#$%@lldladsdalwoerutqql/a/s.ccmcvncvldsaw'
@@ -29,7 +32,7 @@ app.get('/', (req, res) => {
 
 const CONNECTION_URL = 'mongodb+srv://apn:Gnb0009@cluster0.a7xl6ew.mongodb.net/?retryWrites=true&w=majority'
 app.get('/signup', async (req, res) => {
-    res.render('signup.ejs')
+    res.render('signupAdmin.ejs')
 })
 app.post('/signup', async (req, res) => {
     console.log('sign up method')
@@ -38,7 +41,7 @@ app.post('/signup', async (req, res) => {
         return res.json({ status: 'error' })
     }
     const username = req.body.username, password = req.body.password, useremail = req.body.useremail, phoneNumber = req.body.phoneNumber
-    const department = req.body.department, doj = req.body.doj
+    const Organization = req.body.Organization
 
     if (!username || typeof username !== 'string') {
         return res.json({ status: 'error', error: 'invalid username' })
@@ -53,32 +56,35 @@ app.post('/signup', async (req, res) => {
     if (!phoneNumber || typeof phoneNumber !== 'string') {
         return res.json({ status: 'error', error: 'invalid phoneNumber' })
     }
-    if (!department || typeof department !== 'string') {
-        return res.json({ status: 'error', error: 'invalid department' })
+    if (!Organization || typeof Organization !== 'string') {
+        return res.json({ status: 'error', error: 'invalid Organization' })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
     console.log('hashed Password ', hashedPassword)
 
     try {
-        const employeeCreated = await employee.create({
+        const adminCreated = await admin.create({
             name: username,
             email: useremail,
             contact: phoneNumber,
-            Department: department,
-            DateOfJoin: doj,
-            isAdmin: true,
+            Organization: Organization,
             password: hashedPassword
 
 
         })
-        console.log(employeeCreated)
+        console.log(adminCreated)
+        const createUser = await user.create({
+            email: useremail,
+            password: hashedPassword
+        })
+        console.log(createUser)
 
     }
     catch (error) {
         console.log(error)
         if (error.code == 11000) {
-            return res.json({ status: "error", error: "duplicate employeename or employeeemail" })
+            return res.json({ status: "error", error: "duplicate username or email is already registered" })
 
         }
         else {
@@ -87,6 +93,7 @@ app.post('/signup', async (req, res) => {
 
     }
     console.log('Successfully Created employer')
+
 
     return res.json({ status: "ok" })
 })
@@ -110,13 +117,31 @@ app.post('/login', async (req, res) => {
             },
             JWT_SECRET
         )
-        return res.json({ status: 'ok', data: token })
+        //const isAdmin = findUser.isAdmin;
+        // if (isAdmin) res.redirect('/dashboardA')
+        // else res.redirect('/dashboardE')
+        res.json({ status: 'ok', data: token })
+
     }
-    res.json({ status: 'error', error: 'Invalid email or password' })
+    return res.json({ status: 'error', error: 'Invalid email or password' })
 
 })
 
 
+app.get('/dashboardA', (req, res) => {
+    res.render('/dashboardAmdin.ejs')
+
+})
+
+
+app.get('/dashboardE', (req, res) => {
+    res.render('/dashboardE.js')
+})
+
+
+app.get('*', (req, res) => {
+    res.render('pageNotFound.ejs')
+})
 mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     app.listen(PORT, () => {
         console.log(`Server is running on Port : ${PORT}`)

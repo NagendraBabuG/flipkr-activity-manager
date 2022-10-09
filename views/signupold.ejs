@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sign up</title>
+</head>
+
+<body>
+    <h1>Registration</h1>
+    <form id="reg-form">
+        <label for="username">Name: </label>
+        <input type="text" autocomplete="off" id="username" placeholder="Username" />
+        <br>
+        <label for="password"> Password: </label>
+        <input type="password" autocomplete="off" id="password" placeholder="Password" />
+        <br>
+        <label for="useremail">Email: </label>
+        <input type="email" autocomplete="off" id="useremail" placeholder="Useremail">
+        <br>
+        <label for="phoneNumber">Contact Number: </label>
+        <input type="tel" autocomplete="off" id="phoneNumber" placeholder="ContactNumber">
+        <br>
+        <label for="DOJ">Date Of Joining: </label>
+        <input type="date" autocomplete="off" id="DOJ" placeholder="DOJ">
+        <br>
+        <label for="Department">Department: </label>
+        <input type="text" autocomplete="off" id="Department" placeholder="Department">
+        <br>
+        <input type="submit" value="Sign Up">
+    </form>
+    <div>
+        <h2>Please , Note : you are registering as Admin</h2>
+    </div>
+
+    <script>
+        const form = document.getElementById('reg-form')
+        if (form != null) form.addEventListener('submit', registerUser)
+
+        async function registerUser(event) {
+            event.preventDefault()
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+            const useremail = document.getElementById('useremail').value
+            const phoneNumber = document.getElementById('phoneNumber').value
+            const department = document.getElementById('Department').value
+            const doj = document.getElementById('DOJ').value
+            console.log('in function')
+            console.log(doj)
+            console.log(username)
+            console.log(password)
+            console.log(useremail)
+            console.log(phoneNumber)
+            console.log(department)
+
+            const result = await fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    useremail,
+                    password,
+                    phoneNumber,
+                    department,
+                    doj
+                })
+            }).then((res) => res.json())
+            if (result.error) console.log(result.error)
+            console.log(result.status)
+
+
+        }
+    </script>
+
+
+</body>
+
+</html>
