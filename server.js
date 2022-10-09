@@ -221,17 +221,34 @@ app.post('/login', async (req, res) => {
 
 })
 
-app.post('/addEmployee', auth, (req, res) => {
+app.post('/addEmployee', auth, async (req, res) => {
     const name = req.body.name, password = req.body.password, contact = req.body.contact, doj = req.body.doj
     const Deparment = req.body.Department, email = req.body.email
     const adminId = req.body.id
     console.log(req.body)
     console.log(name, password, contact, doj, Deparment, email, adminId)
+    const hashedPassword = await bcrypt.hash(password, 10)
     try {
+        const employeeCreated = await employee.create({
+            name: name,
+            email: email,
+            contact: contact,
+            Department: Deparment,
+            password: hashedPassword,
+            DateOfJoin: doj,
+            adminId: adminId
+        })
 
     }
     catch (error) {
+        // console.log(error)
+        if (error.code == 11000) {
+            return res.json({ status: "error", error: "duplicate username or email is already registered" })
 
+        }
+        else {
+            return res.json({ status: "error" })
+        }
     }
     res.redirect('/dashboardA')
 
