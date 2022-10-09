@@ -18,9 +18,6 @@ const employeeSchema = new Schema({
     },
     DateOfJoin: {
         type: Date, required: true
-    },
-    isAdmin: {
-        type: Boolean, default: false
     }
     ,
     adminId: {
