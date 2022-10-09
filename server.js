@@ -73,12 +73,7 @@ app.post('/signup', async (req, res) => {
 
 
         })
-        console.log(adminCreated)
-        const createUser = await user.create({
-            email: useremail,
-            password: hashedPassword
-        })
-        console.log(createUser)
+
 
     }
     catch (error) {
@@ -107,23 +102,43 @@ app.post('/login', async (req, res) => {
     const password = req.body.password, useremail = req.body.useremail
     const findUser = await employee.findOne({ email: useremail })
     if (!findUser) {
-        return res.json({ status: 'error', error: 'Invalid email or password database' })
+        const findAdmin = await admin.findOne({ email: useremail })
+        if (findAdmin) {
+            if (await bcrypt.compare(password, findAdmin.password)) {
+                const token = jwt.sign({
+                    id: findAdmin._id,
+                    useremail: findAdmin.email
+                },
+                    JWT_SECRET)
+                console.log('successfully signed in')
+                return res.json({ status: 'ok', data: token })
+            }
+            return res.json({ status: 'error', error: "invalid email or Password" })
+
+        }
     }
-    if (await bcrypt.compare(password, findUser.password)) {
-        const token = jwt.sign(
-            {
-                id: findUser._id,
-                useremail: findUser.useremail
-            },
-            JWT_SECRET
-        )
-        //const isAdmin = findUser.isAdmin;
-        // if (isAdmin) res.redirect('/dashboardA')
-        // else res.redirect('/dashboardE')
-        res.json({ status: 'ok', data: token })
+    else {
+        if (await bcrypt.compare(password, findUser.password)) {
+            const token = jwt.sign(
+                {
+                    id: findUser._id,
+                    useremail: findUser.useremail
+                },
+                JWT_SECRET
+            )
+            //const isAdmin = findUser.isAdmin;
+            // if (isAdmin) res.redirect('/dashboardA')
+            // else res.redirect('/dashboardE')
+            console.log('successfully signed in')
+            return res.json({ status: 'ok', data: token })
+
+        }
+        return res.json({ status: 'error', error: 'Invalid email or password' })
 
     }
-    return res.json({ status: 'error', error: 'Invalid email or password' })
+
+    return res.json({ status: 'error' })
+
 
 })
 
